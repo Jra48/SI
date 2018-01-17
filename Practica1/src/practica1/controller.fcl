@@ -1,0 +1,151 @@
+FUNCTION_BLOCK aceleracion
+
+VAR_INPUT
+    s0 : REAL;
+    s1 : REAL;
+    s2 : REAL;  
+    s3 : REAL;
+    s4 : REAL;
+    s5 : REAL; 
+    s6 : REAL;
+    s7 : REAL;
+    s8 : REAL;
+    sig : REAL;
+END_VAR
+
+VAR_OUTPUT
+    vel : REAL;
+    rot : REAL;
+END_VAR
+
+//EJEMPLO de definición NO VINCULANTE. Hacer lo mismo para los 7 sensores restantes
+FUZZIFY s0
+    TERM near   := (0,1) (0.5,0.7) (1,0.25) (1.5,0);
+    TERM med    := (0.25,0) (0.75,1) (1.25,0.5) (1.5,0);
+    TERM far    := (0,0) (1.5,1);
+END_FUZZIFY
+
+FUZZIFY s1
+    TERM near   := (0,1) (0.5,0.5) (1,0.25) (1.5,0);
+    TERM med    := (0.25,0) (0.75,1) (1.25,0) (1.5,0);
+    TERM far    := (0,0) (1.5,1);
+END_FUZZIFY
+
+FUZZIFY s2
+    TERM near   := (0,1) (0.5,0.5) (1,0.25) (1.5,0);
+    TERM med    := (0.25,0) (0.75,1) (1.25,0) (1.5,0);
+    TERM far    := (0,0) (1.5,1);
+END_FUZZIFY
+
+FUZZIFY s3
+    TERM near   := (0,1) (0.5,0.5) (1,0.25) (1.5,0);
+    TERM med    := (0.25,0) (0.75,1) (1.25,0) (1.5,0);
+    TERM far    := (0,0) (1.5,1);
+END_FUZZIFY
+
+FUZZIFY s4
+    TERM near   := (0,1) (0.5,0.5) (1,0.25) (1.5,0);
+    TERM med    := (0.25,0) (0.75,1) (1.25,0) (1.5,0);
+    TERM far    := (0,0) (1.5,1);
+END_FUZZIFY
+
+FUZZIFY s5
+    TERM near   := (0,1) (0.5,0.5) (1,0.25) (1.5,0);
+    TERM med    := (0.25,0) (0.75,1) (1.25,0) (1.5,0);
+    TERM far    := (0,0) (1.5,1);
+END_FUZZIFY
+
+FUZZIFY s6
+    TERM near   := (0,1) (0.5,0.5) (1,0.25) (1.5,0);
+    TERM med    := (0.25,0) (0.75,1) (1.25,0) (1.5,0);
+    TERM far    := (0,0) (1.5,1);
+END_FUZZIFY
+
+FUZZIFY s7
+    TERM near   := (0,1) (0.5,0.5) (1,0.25) (1.5,0);
+    TERM med    := (0.25,0) (0.75,1) (1.25,0) (1.5,0);
+    TERM far    := (0,0) (1.5,1);
+END_FUZZIFY
+
+FUZZIFY s8
+    TERM near   := (0,1) (0.5,0.5) (1,0.25) (1.5,0);
+    TERM med    := (0.25,0) (0.75,1) (1.25,0) (1.5,0);
+    TERM far    := (0,0) (1.5,1);
+END_FUZZIFY
+
+
+FUZZIFY sig
+    TERM rightHe   :=    (-90,1) (-75,0.5) (-35,0);
+    TERM rightM    :=    (-75,0)(-35,1) (-10,0);
+    TERM recto  :=    (-10,0) (0,1) (10,0);
+    TERM leftM    :=    (10,0) (35,1) (75,0);
+    TERM leftHe   :=    (35,0) (75,0.5) (90,1);
+END_FUZZIFY
+
+
+//EJEMPLO de definición NO VINCULANTE
+DEFUZZIFY vel
+    TERM fast   := (0,0) (2.5,1);
+    TERM med    := (0,0) (1,1) (2.5,0);
+    TERM slow   := (0,1) (2.5,0);
+    // Use 'Center Of Gravity' defuzzification method
+    METHOD : COG;
+    // Default value is 1 (if no rule activates defuzzifier)
+    DEFAULT := 1;
+END_DEFUZZIFY
+
+//EJEMPLO de definición NO VINCULANTE de rot
+DEFUZZIFY rot
+    TERM izqm   :=    (-10,0) (0,0) (10,1);
+    TERM izq    :=    (-10,0)(-5,0) (0,1) (5,1) (10,0);
+    TERM cen    :=    (-10,0) (-5,0) (-2.5,1) (2.5,1) (5,0);
+    TERM der    :=    (-10,0) (-5,1) (0,1) (5,0) (10,0);
+    TERM derm   :=    (-10,1) (0,0) (10,0);
+
+    // Use 'Center Of Gravity' defuzzification method
+    METHOD : COG;
+    // Default value is 1 (if no rule activates defuzzifier)
+    DEFAULT := 0;
+END_DEFUZZIFY
+
+
+
+//Reglas por defecto
+//EJEMPLO de definición de reglas NO VINCULANTE
+RULEBLOCK No1
+    // Use 'min' for 'and' (also implicit use 'max'
+    // for 'or' to fulfill DeMorgan's Law)
+    AND : PROD;
+    // Use 'min' activation method
+    ACT : MIN;
+    // Use 'max' accumulation method
+    ACCU : MAX;
+
+    //Definir las reglas del SE
+    RULE 1: IF s0 IS far THEN vel IS fast;
+    RULE 2: IF s8 IS near THEN vel is slow;
+    RULE 3: IF s0 IS near THEN vel IS slow;
+    RULE 4: IF s7 IS near THEN rot IS izqm;
+    RULE 5: IF s0 IS med THEN vel IS med;
+    RULE 6: IF s7 is near THEN vel is slow;
+    RULE 7: IF s1 IS med THEN vel IS slow;
+    RULE 8: IF s2 IS near THEN rot IS derm;
+    RULE 9: IF s8 IS near THEN rot IS izqm;
+    RULE 10: IF s1 IS med THEN rot IS derm;
+    RULE 11: IF s8 IS med THEN rot IS izqm;
+    RULE 12: IF s1 IS near THEN vel IS slow;
+    RULE 13: IF s1 IS near THEN rot IS derm;
+    RULE 14: IF sig IS rightM THEN rot is der;
+    RULE 15: IF sig IS rightHe THEN rot is derm;
+    RULE 16: IF sig IS leftHe THEN rot IS izqm;
+    RULE 17: IF sig IS leftM THEN rot is izq;
+    RULE 18: IF sig IS recto THEN rot is cen;
+
+     
+    
+
+    
+
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
